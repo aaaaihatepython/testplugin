@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Trumpifier",
+  "version": "1.0",
+  "description": "Summarize and rewrite selected text like Donald Trump.",
+  "permissions": ["contextMenus", "scripting", "activeTab", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": ["<all_urls>"]
+}
