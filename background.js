@@ -6,25 +6,25 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "trumpify") {
-    const [{ result }] = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: () => window.getSelection().toString()
-    });
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  chrome.tabs.sendMessage(tab.id, { action: "getSelectedText" }, async (response) => {
+    if (chrome.runtime.lastError || !response?.text) {
+      console.error("Could not retrieve text:", chrome.runtime.lastError);
+      return;
+    }
 
-    const trumpifiedText = await callOpenAI(result);
-    
+    const trumpifiedText = await callOpenAI(response.text);
+
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: (text) => alert(text),
       args: [trumpifiedText]
     });
-  }
+  });
 });
 
 async function callOpenAI(text) {
-  const key = "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"; // Replace with your real API key
+  const key = "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";
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -44,3 +44,4 @@ async function callOpenAI(text) {
   const data = await res.json();
   return data.choices[0].message.content;
 }
+
